@@ -1,5 +1,6 @@
 import math
 import html
+import textwrap
 
 import numpy as np
 import plotly.graph_objects as go
@@ -13,7 +14,28 @@ st.set_page_config(
 )
 
 
-st.markdown(
+def render_html(content):
+    st.markdown(
+        textwrap.dedent(content).strip(),
+        unsafe_allow_html=True,
+    )
+
+
+def safe(value):
+    return html.escape(str(value))
+
+
+def fmt_int(value):
+    return f"{int(round(value)):,}"
+
+
+def fmt_currency(value, lang):
+    if lang == "ko":
+        return f"{int(round(value)):,}원"
+    return f"₩{int(round(value)):,}"
+
+
+render_html(
     """
     <style>
         :root {
@@ -35,22 +57,22 @@ st.markdown(
 
         .block-container {
             max-width: 1220px;
-            padding-top: 2.2rem;
+            padding-top: 2rem;
             padding-bottom: 5rem;
         }
 
         h1, h2, h3, h4, p, div, span, label {
-            font-family: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo",
-                         "Noto Sans KR", "Segoe UI", sans-serif;
-        }
-
-        h1, h2, h3 {
-            color: var(--ink);
-            letter-spacing: -0.02em;
+            font-family:
+                -apple-system,
+                BlinkMacSystemFont,
+                "Apple SD Gothic Neo",
+                "Noto Sans KR",
+                "Segoe UI",
+                sans-serif;
         }
 
         [data-testid="stHeader"] {
-            background: rgba(244, 241, 234, 0.92);
+            background: rgba(244, 241, 234, 0.94);
         }
 
         .hero {
@@ -62,15 +84,14 @@ st.markdown(
 
         .hero-kicker {
             font-size: 0.78rem;
-            letter-spacing: 0.16em;
-            text-transform: uppercase;
+            letter-spacing: 0.15em;
             color: var(--muted);
             margin-bottom: 0.7rem;
         }
 
         .hero-title {
-            font-size: clamp(2.35rem, 5vw, 4.9rem);
-            line-height: 0.96;
+            font-size: clamp(2.4rem, 5vw, 4.8rem);
+            line-height: 0.98;
             font-weight: 800;
             letter-spacing: -0.055em;
             margin: 0;
@@ -79,46 +100,51 @@ st.markdown(
 
         .hero-sub {
             margin-top: 1rem;
-            font-size: 1.02rem;
+            font-size: 1rem;
             line-height: 1.65;
             color: var(--muted);
-            max-width: 760px;
+            max-width: 800px;
         }
 
         .hero-note {
-            margin-top: 1.1rem;
-            font-size: 0.78rem;
-            line-height: 1.55;
-            color: #7E7A71;
+            margin-top: 1rem;
+            font-size: 0.75rem;
+            line-height: 1.5;
+            color: #817D74;
+        }
+
+        .section-head {
+            margin-top: 2.3rem;
+            margin-bottom: 1rem;
         }
 
         .section-tag {
-            font-size: 0.75rem;
+            font-size: 0.72rem;
             letter-spacing: 0.14em;
-            text-transform: uppercase;
             color: var(--muted);
             margin-bottom: 0.3rem;
         }
 
         .section-title {
             font-size: 2rem;
-            font-weight: 760;
+            font-weight: 780;
             letter-spacing: -0.035em;
-            margin-bottom: 0.45rem;
+            margin-bottom: 0.35rem;
         }
 
         .section-copy {
             color: var(--muted);
-            font-size: 0.95rem;
-            line-height: 1.65;
-            margin-bottom: 1.15rem;
+            font-size: 0.93rem;
+            line-height: 1.6;
             max-width: 860px;
         }
 
         .brief-card,
         .result-card,
         .strategy-card,
-        .sample-card {
+        .status-card,
+        .sample-card,
+        .formula-card {
             background: var(--paper);
             border: 1px solid var(--line);
             border-radius: 10px;
@@ -126,49 +152,47 @@ st.markdown(
         }
 
         .brief-card {
-            padding: 1.45rem 1.55rem;
-            min-height: 100%;
+            padding: 1.45rem;
         }
 
         .brief-overline {
             font-size: 0.72rem;
+            letter-spacing: 0.12em;
             color: var(--muted);
-            letter-spacing: 0.14em;
-            text-transform: uppercase;
             margin-bottom: 0.7rem;
         }
 
         .brief-title {
-            font-size: 1.65rem;
+            font-size: 1.7rem;
             line-height: 1.2;
             font-weight: 780;
             letter-spacing: -0.035em;
-            margin-bottom: 0.35rem;
+            margin-bottom: 0.3rem;
         }
 
         .brief-project {
-            font-size: 0.93rem;
+            font-size: 0.92rem;
             color: var(--muted);
-            margin-bottom: 1.2rem;
+            margin-bottom: 1rem;
         }
 
         .brief-meta {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 0.75rem 1rem;
+            gap: 0.8rem 1rem;
             margin-top: 1rem;
             padding-top: 1rem;
             border-top: 1px solid var(--line);
         }
 
-        .brief-label {
+        .label-small {
             font-size: 0.72rem;
             color: var(--muted);
-            margin-bottom: 0.12rem;
+            margin-bottom: 0.15rem;
         }
 
-        .brief-value {
-            font-size: 0.92rem;
+        .value-normal {
+            font-size: 0.93rem;
             font-weight: 650;
             line-height: 1.4;
         }
@@ -182,9 +206,20 @@ st.markdown(
             line-height: 1.6;
         }
 
+        .data-chip {
+            display: inline-block;
+            font-size: 0.74rem;
+            color: var(--muted);
+            border: 1px solid var(--line);
+            background: var(--paper);
+            border-radius: 999px;
+            padding: 0.3rem 0.6rem;
+            margin-bottom: 0.5rem;
+        }
+
         .result-card {
             padding: 1.05rem 1.1rem;
-            min-height: 128px;
+            min-height: 125px;
         }
 
         .result-label {
@@ -194,71 +229,92 @@ st.markdown(
         }
 
         .result-number {
-            font-size: 1.75rem;
+            font-size: 1.7rem;
             line-height: 1.05;
-            font-weight: 780;
-            letter-spacing: -0.045em;
-            color: var(--ink);
+            font-weight: 790;
+            letter-spacing: -0.04em;
         }
 
         .result-note {
-            font-size: 0.76rem;
+            font-size: 0.73rem;
             color: var(--muted);
-            margin-top: 0.55rem;
             line-height: 1.45;
+            margin-top: 0.55rem;
         }
 
-        .status-wrap {
-            background: var(--paper);
-            border: 1px solid var(--line);
-            border-radius: 10px;
+        .formula-card {
+            padding: 1rem 1.15rem;
+            margin: 0.6rem 0 1.1rem 0;
+        }
+
+        .formula {
+            font-size: 1.05rem;
+            line-height: 1.8;
+            font-weight: 650;
+        }
+
+        .sample-card {
+            padding: 0.85rem 0.9rem;
+        }
+
+        .sample-n {
+            font-size: 0.74rem;
+            color: var(--muted);
+        }
+
+        .sample-error {
+            font-size: 1.25rem;
+            font-weight: 760;
+            margin-top: 0.2rem;
+        }
+
+        .status-card {
             padding: 1.25rem 1.35rem;
         }
 
-        .status-badge {
+        .badge {
             display: inline-block;
-            padding: 0.35rem 0.62rem;
-            border-radius: 999px;
-            font-size: 0.76rem;
+            font-size: 0.75rem;
             font-weight: 760;
-            letter-spacing: 0.02em;
-            margin-bottom: 0.85rem;
+            padding: 0.35rem 0.65rem;
+            border-radius: 999px;
+            margin-bottom: 0.8rem;
         }
 
-        .status-safe {
-            background: #E8EFE8;
-            color: #45604A;
+        .badge-safe {
+            background: #E7EFE8;
+            color: #46614C;
         }
 
-        .status-caution {
-            background: #F6EED9;
-            color: #765D20;
+        .badge-caution {
+            background: #F5ECD5;
+            color: #735A1D;
         }
 
-        .status-adjust {
-            background: #F3E3E0;
+        .badge-adjust {
+            background: #F2E1DE;
             color: #7A4038;
         }
 
-        .status-title {
-            font-size: 1.45rem;
-            font-weight: 780;
-            letter-spacing: -0.03em;
-            margin-bottom: 0.4rem;
+        .status-number {
+            font-size: 1.5rem;
+            font-weight: 790;
+            letter-spacing: -0.035em;
+            margin-bottom: 0.35rem;
         }
 
         .status-copy {
-            color: var(--muted);
-            font-size: 0.92rem;
+            font-size: 0.9rem;
             line-height: 1.6;
+            color: var(--muted);
         }
 
         .strategy-card {
-            padding: 1.15rem 1.25rem;
+            padding: 1.1rem 1.25rem;
         }
 
         .strategy-row {
-            padding: 0.72rem 0;
+            padding: 0.7rem 0;
             border-bottom: 1px solid #E8E3D8;
         }
 
@@ -267,18 +323,18 @@ st.markdown(
         }
 
         .strategy-key {
-            font-size: 0.74rem;
+            font-size: 0.72rem;
             color: var(--muted);
-            margin-bottom: 0.16rem;
+            margin-bottom: 0.15rem;
         }
 
         .strategy-value {
-            font-size: 1rem;
-            font-weight: 670;
+            font-size: 0.98rem;
             line-height: 1.45;
+            font-weight: 660;
         }
 
-        .strategy-hero {
+        .dark-message {
             background: #1F1F1C;
             color: #FFFDF6;
             border-radius: 10px;
@@ -286,59 +342,17 @@ st.markdown(
             margin-top: 1rem;
         }
 
-        .strategy-hero .big {
-            font-size: 1.25rem;
-            line-height: 1.55;
+        .dark-message-main {
+            font-size: 1.2rem;
             font-weight: 730;
+            line-height: 1.55;
             letter-spacing: -0.025em;
         }
 
-        .strategy-hero .small {
+        .dark-message-sub {
+            color: #D0CCC3;
+            font-size: 0.8rem;
             margin-top: 0.55rem;
-            color: #CFCBC2;
-            font-size: 0.82rem;
-            line-height: 1.5;
-        }
-
-        .formula-box {
-            background: var(--paper);
-            border: 1px solid var(--line);
-            border-radius: 10px;
-            padding: 1rem 1.15rem;
-            margin: 0.6rem 0 1.1rem 0;
-        }
-
-        .tiny-note {
-            font-size: 0.76rem;
-            color: var(--muted);
-            line-height: 1.55;
-        }
-
-        .data-label {
-            display: inline-block;
-            font-size: 0.74rem;
-            border: 1px solid var(--line);
-            padding: 0.3rem 0.55rem;
-            border-radius: 999px;
-            color: var(--muted);
-            background: var(--paper);
-            margin-bottom: 0.65rem;
-        }
-
-        .sample-card {
-            padding: 0.85rem 0.9rem;
-            text-align: left;
-        }
-
-        .sample-n {
-            font-size: 0.75rem;
-            color: var(--muted);
-        }
-
-        .sample-e {
-            font-size: 1.25rem;
-            margin-top: 0.18rem;
-            font-weight: 760;
         }
 
         div[data-baseweb="select"] > div,
@@ -351,20 +365,10 @@ st.markdown(
 
         .stButton > button {
             border-radius: 6px;
-            border: 1px solid var(--ink);
             background: var(--paper);
             color: var(--ink);
+            border: 1px solid var(--ink);
             box-shadow: none;
-        }
-
-        .stButton > button:hover {
-            border-color: var(--ink);
-            color: var(--ink);
-            background: #EEE9DE;
-        }
-
-        hr {
-            border-color: var(--line) !important;
         }
 
         @media (max-width: 760px) {
@@ -382,12 +386,11 @@ st.markdown(
             }
 
             .result-number {
-                font-size: 1.45rem;
+                font-size: 1.4rem;
             }
         }
     </style>
-    """,
-    unsafe_allow_html=True,
+    """
 )
 
 
@@ -408,20 +411,18 @@ TEXT = {
         "s3_copy": "모표준편차를 알고 있다는 가정 아래 95% 신뢰구간과 오차범위를 계산",
 
         "s4": "운영 시뮬레이션",
-        "s4_copy": "표본 크기와 운영 조건을 바꾸며 추정의 정밀도와 운영 규모 변화를 비교",
+        "s4_copy": "표본 크기가 달라질 때 추정의 정밀도가 어떻게 변하는지 비교",
 
         "s5": "운영 적정성 분석",
         "s5_copy": "추정된 평균 일 방문객 범위와 현재 일일 수용 가능 인원을 비교",
 
         "s6": "원하는 정확도에 필요한 표본",
-        "s6_copy": "목표 오차범위를 정하면 그 정확도를 얻기 위해 필요한 최소 표본 수를 계산",
+        "s6_copy": "목표 오차범위를 정하고 그 정확도에 필요한 최소 표본 수를 계산",
 
         "s7": "전략 요약",
         "s7_copy": "기획 정보와 통계 분석 결과를 하나의 브랜드 전략 요약으로 정리",
 
-        "virtual_data": "교육용 가상 표본 데이터",
-        "virtual_desc": "유사한 조건의 팝업스토어 데이터를 가정",
-
+        "brief": "기획 요약",
         "collab_project": "협업 프로젝트",
         "popup_name": "팝업명",
         "location": "장소",
@@ -435,13 +436,16 @@ TEXT = {
         "capacity": "일일 수용 가능 인원",
         "budget": "전체 예산",
         "concept_line": "콘셉트 한 줄",
-        "brief": "기획 요약",
 
         "days_unit": "일",
         "staff_unit": "명",
-        "capacity_unit": "명 / 일",
+        "visitors": "명",
+        "samples": "개",
 
-        "budget_note": "기획 정보로만 표시 · 통계 계산에는 사용하지 않음",
+        "budget_note": "기획 정보로만 사용 · 통계 계산에는 포함하지 않음",
+
+        "virtual_data": "교육용 가상 표본 데이터",
+        "virtual_desc": "유사한 조건의 팝업스토어 운영 데이터를 가정",
 
         "sample_n": "표본 크기 n",
         "sample_mean": "표본평균 x̄",
@@ -449,32 +453,34 @@ TEXT = {
         "sigma": "모표준편차 σ",
         "sigma_help": "유사 팝업의 일 방문객 변동 정도",
 
+        "formula_title": "사용 공식",
         "sample_mean_card": "표본평균",
         "moe": "오차범위",
-        "ci95": "95% 신뢰구간",
-        "period_reference": "운영기간 환산",
+        "ci": "95% 신뢰구간",
+        "period": "운영기간 환산",
         "period_note": "평균 일 방문객 신뢰구간을 운영일수에 맞게 단순 환산한 참고값 · 특정 날짜 또는 전체 방문객의 예측구간은 아님",
 
         "ci_chart": "95% 신뢰구간",
-        "lower": "하한",
         "mean": "평균",
+        "lower": "하한",
         "upper": "상한",
 
-        "sample_vs_error": "표본 크기에 따른 오차범위 변화",
+        "sample_chart": "표본 크기에 따른 오차범위 변화",
         "sample_x": "표본 크기 n",
         "error_y": "오차범위",
-        "sample_interpret": "표본이 많아질수록 오차범위 감소 → 모평균을 더 정밀하게 추정",
-        "compare_title": "표본 크기 비교",
+        "sample_desc": "표본이 많아질수록 오차범위 감소 → 모평균을 더 정밀하게 추정",
+        "compare": "표본 크기 비교",
+        "current_n": "현재 n",
 
-        "status_safe": "운영 안정",
-        "status_caution": "수용량 주의",
-        "status_adjust": "운영 조정 필요",
+        "safe": "운영 안정",
+        "caution": "수용량 주의",
+        "adjust": "운영 조정 필요",
 
-        "status_safe_copy": "추정된 평균 방문 규모가 현재 수용 범위 안",
-        "status_caution_copy": "예상 방문 규모의 일부가 현재 운영 범위를 초과",
-        "status_adjust_copy": "추정된 평균 방문 규모가 현재 수용량보다 높음",
+        "safe_copy": "추정된 평균 방문 규모가 현재 수용 범위 안",
+        "caution_copy": "예상 방문 규모의 일부가 현재 운영 범위를 초과",
+        "adjust_copy": "추정된 평균 방문 규모가 현재 수용량보다 높음",
 
-        "main_risk": "주요 위험",
+        "risk": "주요 위험",
         "risk_safe": "큰 수용량 위험 신호 없음",
         "risk_caution": "피크 시간 혼잡 가능성",
         "risk_adjust": "지속적인 수용량 부족 가능성",
@@ -486,38 +492,30 @@ TEXT = {
 
         "target_error": "목표 오차범위",
         "min_sample": "필요 최소 표본",
-        "more_needed": "추가 필요 표본",
+        "additional": "추가 필요 표본",
         "goal_met": "현재 표본으로 목표 정확도 충족",
-        "need_copy": "오차범위를 ±{e}명 이내로 줄이려면 최소 {n}개의 표본 필요",
+        "need_sentence": "오차범위를 ±{error}명 이내로 줄이려면 최소 {n}개의 표본 필요",
 
         "project": "프로젝트",
-        "operation_days": "운영 기간",
+        "operating_days": "운영 기간",
         "daily_demand": "예상 평균 일 방문 규모",
         "daily_capacity": "일일 수용 가능 인원",
-        "operation_status": "운영 상태",
-        "data_precision": "데이터 정확도",
+        "status": "운영 상태",
+        "precision": "데이터 정확도",
         "target_precision": "목표 정확도",
-        "needed_sample": "필요 최소 표본",
-        "key_adjustment": "권장 조정",
 
-        "core_message": "창의적인 팝업 기획을 통계적 추정을 통해 실제 실행 가능한 전략으로 연결",
+        "core": "창의적인 팝업 기획을 통계적 추정을 통해 실제 실행 가능한 전략으로 연결",
         "core_sub": "Creative Direction × Brand Analytics × Statistical Estimation",
 
-        "caution_title": "통계 해석 시 주의",
-        "c1": "본 앱의 데이터는 교육용 가상 데이터",
-        "c2": "모표준편차를 알고 있다고 가정",
-        "c3": "신뢰구간은 평균 일 방문객에 대한 추정",
-        "c4": "특정 하루 방문객의 예측구간과는 다름",
-        "c5": "실제 팝업 운영에는 비용, 안전, 시간대별 방문 패턴 등 추가 정보 필요",
-        "c6": "모집단이 정규분포를 따르거나 표본이 충분히 큰 상황을 가정",
+        "warning": "통계 해석 시 주의",
+        "w1": "본 앱의 데이터는 교육용 가상 데이터",
+        "w2": "모표준편차를 알고 있다고 가정",
+        "w3": "신뢰구간은 평균 일 방문객에 대한 추정",
+        "w4": "특정 하루의 방문객 예측구간과는 다름",
+        "w5": "실제 운영에는 비용, 안전, 시간대별 방문 패턴 등 추가 정보 필요",
+        "w6": "모집단이 정규분포를 따르거나 표본이 충분히 큰 상황을 가정",
 
-        "formula_title": "사용 공식",
-        "current_marker": "현재 n",
-
-        "visitors": "명",
-        "observations": "개",
-
-        "project_type_values": {
+        "collab_values": {
             "limited": "한정 협업 컬렉션",
             "new": "신제품 공개",
             "film": "브랜드 × 영화 협업",
@@ -553,32 +551,30 @@ TEXT = {
         "hero_kicker": "STÜSSY × TOY STORY · CONCEPT COLLABORATION · THE HYUNDAI SEOUL",
         "hero_title": "Pop-up Strategy Simulator",
         "hero_sub": "An educational simulator connecting creative pop-up planning with executable scale through statistical estimation",
-        "hero_note": "A fictional collaboration simulator created for a school statistics project · Not officially affiliated with Stüssy, Toy Story, Disney/Pixar, or The Hyundai Seoul",
+        "hero_note": "Fictional collaboration simulator for a school statistics project · Not officially affiliated with Stüssy, Toy Story, Disney/Pixar, or The Hyundai Seoul",
 
         "s1": "Pop-up Planning",
-        "s1_copy": "Set the collaboration concept and operating conditions, then review the creative brief in one view",
+        "s1_copy": "Set the collaboration concept and operating conditions and review the creative brief",
 
         "s2": "Reference Data",
-        "s2_copy": "Set sample information using fictional data from comparable pop-up operations",
+        "s2_copy": "Set fictional sample information from comparable pop-up operations",
 
         "s3": "Statistical Estimation",
-        "s3_copy": "Calculate the 95% confidence interval and margin of error assuming the population standard deviation is known",
+        "s3_copy": "Calculate the 95% confidence interval and margin of error assuming population standard deviation is known",
 
         "s4": "Operating Simulation",
-        "s4_copy": "Change sample size and operating conditions to compare statistical precision and planned scale",
+        "s4_copy": "Compare how statistical precision changes as sample size changes",
 
         "s5": "Capacity Review",
-        "s5_copy": "Compare the estimated mean daily visitor range with planned daily capacity",
+        "s5_copy": "Compare estimated mean daily visitor demand with planned daily capacity",
 
         "s6": "Required Sample Size",
-        "s6_copy": "Choose a target margin of error and calculate the minimum sample size required",
+        "s6_copy": "Choose a target margin of error and calculate the minimum required sample",
 
         "s7": "Strategy Summary",
-        "s7_copy": "Combine the creative brief and statistical analysis into one concise strategy view",
+        "s7_copy": "Combine the creative brief and statistical results into one strategy summary",
 
-        "virtual_data": "Fictional educational sample data",
-        "virtual_desc": "Assumed data from comparable pop-up operations",
-
+        "brief": "Creative brief",
         "collab_project": "Collaboration project",
         "popup_name": "Pop-up name",
         "location": "Location",
@@ -592,13 +588,16 @@ TEXT = {
         "capacity": "Daily capacity",
         "budget": "Total budget",
         "concept_line": "Concept line",
-        "brief": "Creative brief",
 
         "days_unit": "days",
         "staff_unit": "staff",
-        "capacity_unit": "visitors / day",
+        "visitors": "visitors",
+        "samples": "obs.",
 
-        "budget_note": "Planning information only · Not used in statistical calculations",
+        "budget_note": "Planning information only · Not included in statistical calculations",
+
+        "virtual_data": "Fictional educational sample data",
+        "virtual_desc": "Assumed data from comparable pop-up operations",
 
         "sample_n": "Sample size n",
         "sample_mean": "Sample mean x̄",
@@ -606,32 +605,34 @@ TEXT = {
         "sigma": "Population standard deviation σ",
         "sigma_help": "Variation in daily visitors across comparable pop-ups",
 
+        "formula_title": "Formula",
         "sample_mean_card": "Sample mean",
         "moe": "Margin of error",
-        "ci95": "95% confidence interval",
-        "period_reference": "Operating-period reference",
-        "period_note": "A simple multiplication of the mean daily visitor confidence interval by operating days · Not a prediction interval for a specific day or total attendance",
+        "ci": "95% confidence interval",
+        "period": "Operating-period reference",
+        "period_note": "Simple multiplication of the mean-daily-visitor confidence interval by operating days · Not a prediction interval for a specific day or total attendance",
 
         "ci_chart": "95% Confidence Interval",
-        "lower": "Lower",
         "mean": "Mean",
+        "lower": "Lower",
         "upper": "Upper",
 
-        "sample_vs_error": "Sample Size vs Margin of Error",
+        "sample_chart": "Sample Size vs Margin of Error",
         "sample_x": "Sample size n",
         "error_y": "Margin of error",
-        "sample_interpret": "Larger sample → smaller margin of error → more precise estimation of the population mean",
-        "compare_title": "Sample-size comparison",
+        "sample_desc": "Larger sample → smaller margin of error → more precise estimation",
+        "compare": "Sample-size comparison",
+        "current_n": "Current n",
 
-        "status_safe": "Capacity Stable",
-        "status_caution": "Capacity Caution",
-        "status_adjust": "Adjustment Needed",
+        "safe": "Capacity Stable",
+        "caution": "Capacity Caution",
+        "adjust": "Adjustment Needed",
 
-        "status_safe_copy": "Estimated mean visitor demand remains within current capacity",
-        "status_caution_copy": "Part of the estimated mean visitor range exceeds current capacity",
-        "status_adjust_copy": "Estimated mean visitor demand is above current capacity",
+        "safe_copy": "Estimated mean visitor demand remains within current capacity",
+        "caution_copy": "Part of the estimated mean visitor range exceeds current capacity",
+        "adjust_copy": "Estimated mean visitor demand is above current capacity",
 
-        "main_risk": "Main risk",
+        "risk": "Main risk",
         "risk_safe": "No major capacity warning",
         "risk_caution": "Possible peak-time congestion",
         "risk_adjust": "Possible persistent capacity shortage",
@@ -643,38 +644,30 @@ TEXT = {
 
         "target_error": "Target margin of error",
         "min_sample": "Minimum sample required",
-        "more_needed": "Additional samples needed",
+        "additional": "Additional samples needed",
         "goal_met": "Current sample meets the target precision",
-        "need_copy": "To keep the margin of error within ±{e} visitors, at least {n} observations are required",
+        "need_sentence": "To keep the margin of error within ±{error} visitors, at least {n} observations are required",
 
         "project": "Project",
-        "operation_days": "Operating days",
+        "operating_days": "Operating days",
         "daily_demand": "Estimated mean daily visitors",
         "daily_capacity": "Daily capacity",
-        "operation_status": "Operating status",
-        "data_precision": "Data precision",
+        "status": "Operating status",
+        "precision": "Data precision",
         "target_precision": "Target precision",
-        "needed_sample": "Minimum sample required",
-        "key_adjustment": "Recommended adjustment",
 
-        "core_message": "Connecting creative pop-up planning with executable strategy through statistical estimation",
+        "core": "Connecting creative pop-up planning with executable strategy through statistical estimation",
         "core_sub": "Creative Direction × Brand Analytics × Statistical Estimation",
 
-        "caution_title": "Statistical interpretation notes",
-        "c1": "All data in this app are fictional and for educational use",
-        "c2": "The population standard deviation is assumed to be known",
-        "c3": "The confidence interval estimates the mean daily visitor count",
-        "c4": "It is not a prediction interval for a specific day",
-        "c5": "Real pop-up operations also require cost, safety, and time-of-day demand data",
-        "c6": "A normal population or a sufficiently large sample is assumed",
+        "warning": "Statistical interpretation notes",
+        "w1": "All app data are fictional and for educational use",
+        "w2": "Population standard deviation is assumed to be known",
+        "w3": "The confidence interval estimates mean daily visitors",
+        "w4": "It is not a prediction interval for a specific day",
+        "w5": "Real operations also require cost, safety, and time-of-day demand data",
+        "w6": "A normal population or sufficiently large sample is assumed",
 
-        "formula_title": "Formula",
-        "current_marker": "Current n",
-
-        "visitors": "visitors",
-        "observations": "obs.",
-
-        "project_type_values": {
+        "collab_values": {
             "limited": "Limited collaboration collection",
             "new": "New product launch",
             "film": "Brand × film collaboration",
@@ -712,9 +705,9 @@ if "language_selector" not in st.session_state:
     st.session_state.language_selector = "한국어"
 
 
-_, language_column = st.columns([5.2, 1.3])
+_, language_col = st.columns([5.2, 1.3])
 
-with language_column:
+with language_col:
     selected_language = st.radio(
         "Language",
         ["한국어", "English"],
@@ -731,50 +724,36 @@ def t(key):
     return TEXT[LANG][key]
 
 
-def safe(value):
-    return html.escape(str(value))
-
-
-def fmt_int(value):
-    return f"{int(round(value)):,}"
-
-
-def fmt_currency(value):
-    if LANG == "ko":
-        return f"{int(round(value)):,}원"
-    return f"₩{int(round(value)):,}"
-
-
 def section_header(number, title, copy):
-    st.markdown(
+    render_html(
         f"""
-        <div style="margin-top:2.2rem;margin-bottom:0.9rem">
+        <div class="section-head">
             <div class="section-tag">{safe(number)}</div>
             <div class="section-title">{safe(title)}</div>
             <div class="section-copy">{safe(copy)}</div>
         </div>
-        """,
-        unsafe_allow_html=True,
+        """
     )
 
 
-def result_card(label, number, note=""):
-    note_html = (
-        f'<div class="result-note">{safe(음표)}</div>'
-        if note
-        else ""
-    )
+def result_card(label, value, detail=""):
+    detail_html = ""
+
+    if detail:
+        detail_html = (
+            f'<div class="result-note">{safe(detail)}</div>'
+        )
 
     return f"""
-        <div class="result-card">
-            <div class="result-label">{safe(label)}</div>
-            <div class="result-number">{safe(number)}</div>
-            {note_html}
-        </div>
+    <div class="result-card">
+        <div class="result-label">{safe(label)}</div>
+        <div class="result-number">{safe(value)}</div>
+        {detail_html}
+    </div>
     """
 
 
-st.markdown(
+render_html(
     f"""
     <div class="hero">
         <div class="hero-kicker">{safe(t("hero_kicker"))}</div>
@@ -782,12 +761,15 @@ st.markdown(
         <div class="hero-sub">{safe(t("hero_sub"))}</div>
         <div class="hero-note">{safe(t("hero_note"))}</div>
     </div>
-    """,
-    unsafe_allow_html=True,
+    """
 )
 
 
-section_header("01", t("s1"), t("s1_copy"))
+section_header(
+    "01",
+    t("s1"),
+    t("s1_copy"),
+)
 
 
 planning_left, planning_right = st.columns(
@@ -805,7 +787,9 @@ with planning_left:
     )
 
     if "popup_name" not in st.session_state:
-        st.session_state.popup_name = "스투시 × 토이 스토리 협업 팝업"
+        st.session_state.popup_name = (
+            "스투시 × 토이 스토리 협업 팝업"
+        )
 
     popup_name = st.text_input(
         t("popup_name"),
@@ -820,9 +804,9 @@ with planning_left:
         key="popup_location",
     )
 
-    plan_col_1, plan_col_2 = st.columns(2)
+    form_left, form_right = st.columns(2)
 
-    with plan_col_1:
+    with form_left:
 
         collab_type = st.selectbox(
             t("collab_type"),
@@ -833,7 +817,7 @@ with planning_left:
                 "season",
             ],
             index=2,
-            format_func=lambda value: t("project_type_values")[value],
+            format_func=lambda x: t("collab_values")[x],
             key="collab_type",
         )
 
@@ -847,7 +831,7 @@ with planning_left:
                 "all",
             ],
             default=["all"],
-            format_func=lambda value: t("character_values")[value],
+            format_func=lambda x: t("character_values")[x],
             key="characters",
         )
 
@@ -866,7 +850,7 @@ with planning_left:
                 "cap",
                 "bag",
             ],
-            format_func=lambda value: t("product_values")[value],
+            format_func=lambda x: t("product_values")[x],
             key="products",
         )
 
@@ -880,11 +864,11 @@ with planning_left:
                 "mixed",
             ],
             index=3,
-            format_func=lambda value: t("space_values")[value],
+            format_func=lambda x: t("space_values")[x],
             key="space_concept",
         )
 
-    with plan_col_2:
+    with form_right:
 
         operating_days = st.slider(
             t("days"),
@@ -931,12 +915,15 @@ with planning_left:
         key="budget",
     )
 
-    st.caption(t("budget_note"))
+    st.caption(
+        t("budget_note")
+    )
 
     if "concept_line" not in st.session_state:
         st.session_state.concept_line = (
             "토이 스토리의 친숙한 세계관을 "
-            "스투시의 스트리트 감성으로 재해석한 한정 협업 공간"
+            "스투시의 스트리트 감성으로 재해석한 "
+            "한정 협업 공간"
         )
 
     concept_line = st.text_area(
@@ -950,8 +937,8 @@ with planning_right:
 
     character_labels = (
         [
-            t("character_values")[value]
-            for value in selected_characters
+            t("character_values")[item]
+            for item in selected_characters
         ]
         if selected_characters
         else ["-"]
@@ -959,17 +946,16 @@ with planning_right:
 
     product_labels = (
         [
-            t("product_values")[value]
-            for value in selected_products
+            t("product_values")[item]
+            for item in selected_products
         ]
         if selected_products
         else ["-"]
     )
 
-    st.markdown(
+    render_html(
         f"""
         <div class="brief-card">
-
             <div class="brief-overline">
                 {safe(t("brief"))}
             </div>
@@ -982,11 +968,15 @@ with planning_right:
                 {safe(collab_project)}
             </div>
 
-            <div style="font-size:0.95rem;font-weight:650">
+            <div class="value-normal">
                 {safe(popup_location)}
             </div>
 
-            <div style="font-size:0.9rem;color:#6C6A63;margin-top:0.3rem">
+            <div style="
+                margin-top:0.35rem;
+                color:#6C6A63;
+                font-size:0.9rem;
+            ">
                 {operating_days} {safe(t("days_unit"))}
                 · {space_size}㎡
                 · {staff_count} {safe(t("staff_unit"))}
@@ -995,57 +985,57 @@ with planning_right:
             <div class="brief-meta">
 
                 <div>
-                    <div class="brief-label">
+                    <div class="label-small">
                         {safe(t("collab_type"))}
                     </div>
-                    <div class="brief-value">
-                        {safe(t("project_type_values")[collab_type])}
+                    <div class="value-normal">
+                        {safe(t("collab_values")[collab_type])}
                     </div>
                 </div>
 
                 <div>
-                    <div class="brief-label">
+                    <div class="label-small">
                         {safe(t("capacity"))}
                     </div>
-                    <div class="brief-value">
+                    <div class="value-normal">
                         {fmt_int(daily_capacity)}
-                        {safe(t("capacity_unit"))}
+                        {safe(t("visitors"))} / {safe(t("days_unit"))}
                     </div>
                 </div>
 
                 <div>
-                    <div class="brief-label">
+                    <div class="label-small">
                         {safe(t("products"))}
                     </div>
-                    <div class="brief-value">
+                    <div class="value-normal">
                         {safe(" · ".join(product_labels))}
                     </div>
                 </div>
 
                 <div>
-                    <div class="brief-label">
+                    <div class="label-small">
                         {safe(t("space_concept"))}
                     </div>
-                    <div class="brief-value">
+                    <div class="value-normal">
                         {safe(t("space_values")[space_concept])}
                     </div>
                 </div>
 
                 <div>
-                    <div class="brief-label">
+                    <div class="label-small">
                         {safe(t("characters"))}
                     </div>
-                    <div class="brief-value">
+                    <div class="value-normal">
                         {safe(" · ".join(character_labels))}
                     </div>
                 </div>
 
                 <div>
-                    <div class="brief-label">
+                    <div class="label-small">
                         {safe(t("budget"))}
                     </div>
-                    <div class="brief-value">
-                        {safe(fmt_currency(budget))}
+                    <div class="value-normal">
+                        {safe(fmt_currency(budget, LANG))}
                     </div>
                 </div>
 
@@ -1054,34 +1044,38 @@ with planning_right:
             <div class="concept-box">
                 {safe(concept_line)}
             </div>
-
         </div>
-        """,
-        unsafe_allow_html=True,
+        """
     )
 
 
-section_header("02", t("s2"), t("s2_copy"))
-
-
-st.markdown(
-    f"""
-    <span class="data-label">
-        {safe(t("virtual_data"))}
-    </span>
-
-    <div class="tiny-note" style="margin-bottom:0.9rem">
-        {safe(t("virtual_desc"))}
-    </div>
-    """,
-    unsafe_allow_html=True,
+section_header(
+    "02",
+    t("s2"),
+    t("s2_copy"),
 )
 
 
-data_col_1, data_col_2, data_col_3 = st.columns(3)
+render_html(
+    f"""
+    <span class="data-chip">
+        {safe(t("virtual_data"))}
+    </span>
+    <div style="
+        color:#6C6A63;
+        font-size:0.78rem;
+        margin-bottom:0.9rem;
+    ">
+        {safe(t("virtual_desc"))}
+    </div>
+    """
+)
 
 
-with data_col_1:
+data_1, data_2, data_3 = st.columns(3)
+
+
+with data_1:
 
     sample_n = st.number_input(
         t("sample_n"),
@@ -1093,7 +1087,7 @@ with data_col_1:
     )
 
 
-with data_col_2:
+with data_2:
 
     sample_mean = st.number_input(
         t("sample_mean"),
@@ -1107,7 +1101,7 @@ with data_col_2:
     )
 
 
-with data_col_3:
+with data_3:
 
     sigma = st.number_input(
         t("sigma"),
@@ -1155,90 +1149,76 @@ period_upper = (
 )
 
 
-section_header("03", t("s3"), t("s3_copy"))
+section_header(
+    "03",
+    t("s3"),
+    t("s3_copy"),
+)
 
 
-st.markdown(
+render_html(
     f"""
-    <div class="formula-box">
-
-        <div style="
-            font-size:0.78rem;
-            color:#6C6A63;
-            margin-bottom:0.45rem
-        ">
+    <div class="formula-card">
+        <div class="label-small">
             {safe(t("formula_title"))}
         </div>
 
-        <div style="
-            font-size:1.08rem;
-            font-weight:650;
-            line-height:1.8
-        ">
+        <div class="formula">
             E = 1.96 × σ / √n
             <br>
             x̄ − E ≤ μ ≤ x̄ + E
         </div>
-
     </div>
-    """,
-    unsafe_allow_html=True,
+    """
 )
 
 
-result_1, result_2, result_3, result_4 = st.columns(
+r1, r2, r3, r4 = st.columns(
     4,
     gap="small",
 )
 
 
-with result_1:
+with r1:
 
-    st.markdown(
+    render_html(
         result_card(
             t("sample_mean_card"),
             f"{fmt_int(sample_mean)} {t('visitors')}",
-        ),
-        unsafe_allow_html=True,
+        )
     )
 
 
-with result_2:
+with r2:
 
-    st.markdown(
+    render_html(
         result_card(
             t("moe"),
             f"±{fmt_int(margin_error)} {t('visitors')}",
-        ),
-        unsafe_allow_html=True,
+        )
     )
 
 
-with result_3:
+with r3:
 
-    st.markdown(
+    render_html(
         result_card(
-            t("ci95"),
+            t("ci"),
             f"{fmt_int(ci_lower)} – {fmt_int(ci_upper)}",
             t("visitors"),
-        ),
-        unsafe_allow_html=True,
+        )
     )
 
 
-with result_4:
+with r4:
 
-    st.markdown(
+    render_html(
         result_card(
-            t("period_reference"),
+            t("period"),
             f"{fmt_int(period_lower)} – {fmt_int(period_upper)}",
             t("period_note"),
-        ),
-        unsafe_allow_html=True,
+        )
     )
-
-
-st.write("")
 
 
 fig_ci = go.Figure()
@@ -1271,12 +1251,8 @@ fig_ci.add_trace(
 
 fig_ci.add_trace(
     go.Scatter(
-        x=[
-            sample_mean,
-        ],
-        y=[
-            0,
-        ],
+        x=[sample_mean],
+        y=[0],
         mode="markers+text",
         marker=dict(
             size=15,
@@ -1286,9 +1262,7 @@ fig_ci.add_trace(
                 width=1,
             ),
         ),
-        text=[
-            t("mean"),
-        ],
+        text=[t("mean")],
         textposition="top center",
         hovertemplate="%{x:,.0f}<extra></extra>",
         showlegend=False,
@@ -1327,7 +1301,6 @@ fig_ci.update_layout(
         ],
         showgrid=False,
         zeroline=False,
-        title="",
         tickformat=",",
     ),
     yaxis=dict(
@@ -1349,28 +1322,32 @@ st.plotly_chart(
 )
 
 
-ci_text_1, ci_text_2, ci_text_3 = st.columns(3)
+ci_col_1, ci_col_2, ci_col_3 = st.columns(3)
 
 
-with ci_text_1:
+with ci_col_1:
     st.caption(
         f"{t('lower')}  {fmt_int(ci_lower)}"
     )
 
 
-with ci_text_2:
+with ci_col_2:
     st.caption(
         f"{t('mean')}  {fmt_int(sample_mean)}"
     )
 
 
-with ci_text_3:
+with ci_col_3:
     st.caption(
         f"{t('upper')}  {fmt_int(ci_upper)}"
     )
 
 
-section_header("04", t("s4"), t("s4_copy"))
+section_header(
+    "04",
+    t("s4"),
+    t("s4_copy"),
+)
 
 
 n_values = np.arange(
@@ -1399,7 +1376,8 @@ fig_error.add_trace(
             width=3,
         ),
         hovertemplate=(
-            "n = %{x}<br>±%{y:.1f}"
+            "n = %{x}<br>"
+            "±%{y:.1f}"
             "<extra></extra>"
         ),
         showlegend=False,
@@ -1409,12 +1387,8 @@ fig_error.add_trace(
 
 fig_error.add_trace(
     go.Scatter(
-        x=[
-            sample_n,
-        ],
-        y=[
-            margin_error,
-        ],
+        x=[sample_n],
+        y=[margin_error],
         mode="markers",
         marker=dict(
             size=13,
@@ -1425,9 +1399,8 @@ fig_error.add_trace(
             ),
         ),
         hovertemplate=(
-            f"{t('current_marker')}: "
-            f"{sample_n}<br>"
-            f"±{margin_error:.1f}"
+            f"{t('current_n')}: {sample_n}"
+            f"<br>±{margin_error:.1f}"
             "<extra></extra>"
         ),
         showlegend=False,
@@ -1437,7 +1410,7 @@ fig_error.add_trace(
 
 fig_error.update_layout(
     title=dict(
-        text=t("sample_vs_error"),
+        text=t("sample_chart"),
         x=0,
         xanchor="left",
     ),
@@ -1480,24 +1453,24 @@ st.plotly_chart(
 
 
 st.caption(
-    t("sample_interpret")
+    t("sample_desc")
 )
 
 
-st.markdown(
+render_html(
     f"""
     <div style="
+        font-size:1rem;
         font-weight:730;
-        margin:1.3rem 0 0.65rem 0
+        margin:1.2rem 0 0.65rem 0;
     ">
-        {safe(t("compare_title"))}
+        {safe(t("compare"))}
     </div>
-    """,
-    unsafe_allow_html=True,
+    """
 )
 
 
-compare_values = [
+compare_sizes = [
     20,
     50,
     100,
@@ -1505,49 +1478,50 @@ compare_values = [
 ]
 
 
-compare_columns = st.columns(4)
+compare_cols = st.columns(4)
 
 
-for column, compare_n in zip(
-    compare_columns,
-    compare_values,
+for column, n_compare in zip(
+    compare_cols,
+    compare_sizes,
 ):
 
     compare_error = (
         Z95
         * sigma
-        / math.sqrt(compare_n)
+        / math.sqrt(n_compare)
     )
 
     with column:
 
-        st.markdown(
+        render_html(
             f"""
             <div class="sample-card">
-
                 <div class="sample-n">
-                    n = {compare_n}
+                    n = {n_compare}
                 </div>
 
-                <div class="sample-e">
+                <div class="sample-error">
                     ±{fmt_int(compare_error)}
                     {safe(t("visitors"))}
                 </div>
-
             </div>
-            """,
-            unsafe_allow_html=True,
+            """
         )
 
 
-section_header("05", t("s5"), t("s5_copy"))
+section_header(
+    "05",
+    t("s5"),
+    t("s5_copy"),
+)
 
 
 if daily_capacity >= ci_upper:
 
     status_code = "safe"
-    status_title = t("status_safe")
-    status_copy = t("status_safe_copy")
+    status_title = t("safe")
+    status_copy = t("safe_copy")
     risk_text = t("risk_safe")
     recommendation = t("rec_safe")
 
@@ -1555,8 +1529,8 @@ if daily_capacity >= ci_upper:
 elif daily_capacity >= ci_lower:
 
     status_code = "caution"
-    status_title = t("status_caution")
-    status_copy = t("status_caution_copy")
+    status_title = t("caution")
+    status_copy = t("caution_copy")
     risk_text = t("risk_caution")
     recommendation = t("rec_caution")
 
@@ -1564,36 +1538,35 @@ elif daily_capacity >= ci_lower:
 else:
 
     status_code = "adjust"
-    status_title = t("status_adjust")
-    status_copy = t("status_adjust_copy")
+    status_title = t("adjust")
+    status_copy = t("adjust_copy")
     risk_text = t("risk_adjust")
     recommendation = t("rec_adjust")
 
 
-status_class = {
-    "safe": "status-safe",
-    "caution": "status-caution",
-    "adjust": "status-adjust",
+badge_class = {
+    "safe": "badge-safe",
+    "caution": "badge-caution",
+    "adjust": "badge-adjust",
 }[status_code]
 
 
 status_left, status_right = st.columns(
-    [0.85, 1.15],
+    [0.9, 1.1],
     gap="large",
 )
 
 
 with status_left:
 
-    st.markdown(
+    render_html(
         f"""
-        <div class="status-wrap">
-
-            <span class="status-badge {status_class}">
+        <div class="status-card">
+            <span class="badge {badge_class}">
                 {safe(status_title)}
             </span>
 
-            <div class="status-title">
+            <div class="status-number">
                 {fmt_int(ci_lower)}
                 –
                 {fmt_int(ci_upper)}
@@ -1607,35 +1580,31 @@ with status_left:
             <div style="
                 margin-top:1rem;
                 padding-top:0.9rem;
-                border-top:1px solid #E8E3D8
+                border-top:1px solid #E8E3D8;
             ">
-
-                <div class="brief-label">
+                <div class="label-small">
                     {safe(t("daily_capacity"))}
                 </div>
 
-                <div class="brief-value">
+                <div class="value-normal">
                     {fmt_int(daily_capacity)}
                     {safe(t("visitors"))}
                 </div>
-
             </div>
-
         </div>
-        """,
-        unsafe_allow_html=True,
+        """
     )
 
 
 with status_right:
 
-    st.markdown(
+    render_html(
         f"""
         <div class="strategy-card">
 
             <div class="strategy-row">
                 <div class="strategy-key">
-                    {safe(t("main_risk"))}
+                    {safe(t("risk"))}
                 </div>
                 <div class="strategy-value">
                     {safe(risk_text)}
@@ -1671,21 +1640,24 @@ with status_right:
             </div>
 
         </div>
-        """,
-        unsafe_allow_html=True,
+        """
     )
 
 
-section_header("06", t("s6"), t("s6_copy"))
+section_header(
+    "06",
+    t("s6"),
+    t("s6_copy"),
+)
 
 
-required_left, required_right = st.columns(
+sample_left, sample_right = st.columns(
     [0.9, 1.1],
     gap="large",
 )
 
 
-with required_left:
+with sample_left:
 
     target_error = st.number_input(
         t("target_error"),
@@ -1713,27 +1685,34 @@ additional_needed = max(
 )
 
 
-with required_right:
+with sample_right:
 
     if additional_needed > 0:
 
-        required_subcopy = (
-            f"{t('more_needed')} "
+        sample_sub = (
+            f"{t('additional')} "
             f"{additional_needed} "
-            f"{t('observations')}"
+            f"{t('samples')}"
         )
 
     else:
 
-        required_subcopy = (
-            t("goal_met")
+        sample_sub = t("goal_met")
+
+
+    required_sentence = (
+        t("need_sentence").format(
+            error=fmt_int(target_error),
+            n=f"{required_n:,}",
         )
+    )
 
-    st.markdown(
+
+    render_html(
         f"""
-        <div class="status-wrap">
+        <div class="status-card">
 
-            <div class="brief-label">
+            <div class="label-small">
                 {safe(t("min_sample"))}
             </div>
 
@@ -1741,63 +1720,49 @@ with required_right:
                 font-size:2.5rem;
                 font-weight:820;
                 letter-spacing:-0.05em;
-                margin:0.2rem 0 0.5rem 0
+                margin:0.2rem 0 0.5rem 0;
             ">
                 {required_n:,}
             </div>
 
             <div class="status-copy">
-                {
-                    safe(
-                        t("need_copy").format(
-                            e=fmt_int(target_error),
-                            n=f"{required_n:,}",
-                        )
-                    )
-                }
+                {safe(required_sentence)}
             </div>
 
             <div style="
                 margin-top:0.9rem;
                 padding-top:0.8rem;
                 border-top:1px solid #E8E3D8;
-                font-weight:670
+                font-weight:670;
             ">
-                {safe(required_subcopy)}
+                {safe(sample_sub)}
             </div>
 
         </div>
-        """,
-        unsafe_allow_html=True,
+        """
     )
 
 
-st.markdown(
+render_html(
     f"""
-    <div class="formula-box">
-
-        <div style="
-            font-size:0.78rem;
-            color:#6C6A63;
-            margin-bottom:0.45rem
-        ">
+    <div class="formula-card">
+        <div class="label-small">
             {safe(t("formula_title"))}
         </div>
 
-        <div style="
-            font-size:1.08rem;
-            font-weight:650
-        ">
+        <div class="formula">
             n ≥ (1.96σ / E)²
         </div>
-
     </div>
-    """,
-    unsafe_allow_html=True,
+    """
 )
 
 
-section_header("07", t("s7"), t("s7_copy"))
+section_header(
+    "07",
+    t("s7"),
+    t("s7_copy"),
+)
 
 
 summary_left, summary_right = st.columns(
@@ -1808,7 +1773,7 @@ summary_left, summary_right = st.columns(
 
 with summary_left:
 
-    st.markdown(
+    render_html(
         f"""
         <div class="strategy-card">
 
@@ -1832,7 +1797,7 @@ with summary_left:
 
             <div class="strategy-row">
                 <div class="strategy-key">
-                    {safe(t("operation_days"))}
+                    {safe(t("operating_days"))}
                 </div>
                 <div class="strategy-value">
                     {operating_days}
@@ -1863,8 +1828,7 @@ with summary_left:
             </div>
 
         </div>
-        """,
-        unsafe_allow_html=True,
+        """
     )
 
 
@@ -1872,25 +1836,24 @@ with summary_right:
 
     if additional_needed > 0:
 
-        additional_summary = (
-            f"{t('more_needed')} "
+        sample_summary = (
+            f"{t('additional')} "
             f"{additional_needed} "
-            f"{t('observations')}"
+            f"{t('samples')}"
         )
 
     else:
 
-        additional_summary = (
-            t("goal_met")
-        )
+        sample_summary = t("goal_met")
 
-    st.markdown(
+
+    render_html(
         f"""
         <div class="strategy-card">
 
             <div class="strategy-row">
                 <div class="strategy-key">
-                    {safe(t("operation_status"))}
+                    {safe(t("status"))}
                 </div>
                 <div class="strategy-value">
                     {safe(status_title)}
@@ -1899,7 +1862,7 @@ with summary_right:
 
             <div class="strategy-row">
                 <div class="strategy-key">
-                    {safe(t("data_precision"))}
+                    {safe(t("precision"))}
                 </div>
                 <div class="strategy-value">
                     ±{fmt_int(margin_error)}
@@ -1919,18 +1882,18 @@ with summary_right:
 
             <div class="strategy-row">
                 <div class="strategy-key">
-                    {safe(t("needed_sample"))}
+                    {safe(t("min_sample"))}
                 </div>
                 <div class="strategy-value">
                     {required_n:,}
                     ·
-                    {safe(additional_summary)}
+                    {safe(sample_summary)}
                 </div>
             </div>
 
             <div class="strategy-row">
                 <div class="strategy-key">
-                    {safe(t("main_risk"))}
+                    {safe(t("risk"))}
                 </div>
                 <div class="strategy-value">
                     {safe(risk_text)}
@@ -1939,7 +1902,7 @@ with summary_right:
 
             <div class="strategy-row">
                 <div class="strategy-key">
-                    {safe(t("key_adjustment"))}
+                    {safe(t("recommend"))}
                 </div>
                 <div class="strategy-value">
                     {safe(recommendation)}
@@ -1947,26 +1910,24 @@ with summary_right:
             </div>
 
         </div>
-        """,
-        unsafe_allow_html=True,
+        """
     )
 
 
-st.markdown(
+render_html(
     f"""
-    <div class="strategy-hero">
+    <div class="dark-message">
 
-        <div class="big">
-            {safe(t("core_message"))}
+        <div class="dark-message-main">
+            {safe(t("core"))}
         </div>
 
-        <div class="small">
+        <div class="dark-message-sub">
             {safe(t("core_sub"))}
         </div>
 
     </div>
-    """,
-    unsafe_allow_html=True,
+    """
 )
 
 
@@ -1974,16 +1935,16 @@ st.write("")
 
 
 with st.expander(
-    t("caution_title")
+    t("warning")
 ):
 
     st.markdown(
         f"""
-- {t("c1")}
-- {t("c2")}
-- {t("c3")}
-- {t("c4")}
-- {t("c5")}
-- {t("c6")}
+- {t("w1")}
+- {t("w2")}
+- {t("w3")}
+- {t("w4")}
+- {t("w5")}
+- {t("w6")}
         """
     )
