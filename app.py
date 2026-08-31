@@ -15,10 +15,7 @@ st.set_page_config(
 
 
 def render_html(content):
-    st.markdown(
-        textwrap.dedent(content).strip(),
-        unsafe_allow_html=True,
-    )
+    st.html(textwrap.dedent(content).strip())
 
 
 def safe(value):
@@ -400,28 +397,20 @@ TEXT = {
         "hero_title": "팝업 전략 시뮬레이터",
         "hero_sub": "창의적인 팝업 기획을 통계적 추정으로 실제 운영 가능한 규모까지 연결하는 교육용 시뮬레이션",
         "hero_note": "학교 통계 활동을 위해 제작한 가상의 협업 시뮬레이션 · Stüssy, Toy Story, Disney/Pixar 및 더현대 서울과 공식적인 관련 없음",
-
         "s1": "팝업 기획",
         "s1_copy": "협업 콘셉트와 운영 조건을 직접 설정하고 기획 요약을 한 화면에서 확인",
-
         "s2": "기준 데이터 설정",
         "s2_copy": "유사한 조건의 팝업스토어 데이터를 가정해 통계적 추정에 필요한 표본 정보를 설정",
-
         "s3": "통계적 추정",
         "s3_copy": "모표준편차를 알고 있다는 가정 아래 95% 신뢰구간과 오차범위를 계산",
-
         "s4": "운영 시뮬레이션",
         "s4_copy": "표본 크기가 달라질 때 추정의 정밀도가 어떻게 변하는지 비교",
-
         "s5": "운영 적정성 분석",
         "s5_copy": "추정된 평균 일 방문객 범위와 현재 일일 수용 가능 인원을 비교",
-
         "s6": "원하는 정확도에 필요한 표본",
         "s6_copy": "목표 오차범위를 정하고 그 정확도에 필요한 최소 표본 수를 계산",
-
         "s7": "전략 요약",
         "s7_copy": "기획 정보와 통계 분석 결과를 하나의 브랜드 전략 요약으로 정리",
-
         "brief": "기획 요약",
         "collab_project": "협업 프로젝트",
         "popup_name": "팝업명",
@@ -436,66 +425,53 @@ TEXT = {
         "capacity": "일일 수용 가능 인원",
         "budget": "전체 예산",
         "concept_line": "콘셉트 한 줄",
-
         "days_unit": "일",
         "staff_unit": "명",
         "visitors": "명",
         "samples": "개",
-
         "budget_note": "기획 정보로만 사용 · 통계 계산에는 포함하지 않음",
-
         "virtual_data": "교육용 가상 표본 데이터",
         "virtual_desc": "유사한 조건의 팝업스토어 운영 데이터를 가정",
-
         "sample_n": "표본 크기 n",
         "sample_mean": "표본평균 x̄",
         "sample_mean_help": "유사 팝업의 평균 일 방문객",
         "sigma": "모표준편차 σ",
         "sigma_help": "유사 팝업의 일 방문객 변동 정도",
-
         "formula_title": "사용 공식",
         "sample_mean_card": "표본평균",
         "moe": "오차범위",
         "ci": "95% 신뢰구간",
         "period": "운영기간 환산",
         "period_note": "평균 일 방문객 신뢰구간을 운영일수에 맞게 단순 환산한 참고값 · 특정 날짜 또는 전체 방문객의 예측구간은 아님",
-
         "ci_chart": "95% 신뢰구간",
         "mean": "평균",
         "lower": "하한",
         "upper": "상한",
-
         "sample_chart": "표본 크기에 따른 오차범위 변화",
         "sample_x": "표본 크기 n",
         "error_y": "오차범위",
         "sample_desc": "표본이 많아질수록 오차범위 감소 → 모평균을 더 정밀하게 추정",
         "compare": "표본 크기 비교",
         "current_n": "현재 n",
-
         "safe": "운영 안정",
         "caution": "수용량 주의",
         "adjust": "운영 조정 필요",
-
         "safe_copy": "추정된 평균 방문 규모가 현재 수용 범위 안",
         "caution_copy": "예상 방문 규모의 일부가 현재 운영 범위를 초과",
         "adjust_copy": "추정된 평균 방문 규모가 현재 수용량보다 높음",
-
         "risk": "주요 위험",
         "risk_safe": "큰 수용량 위험 신호 없음",
         "risk_caution": "피크 시간 혼잡 가능성",
         "risk_adjust": "지속적인 수용량 부족 가능성",
-
         "recommend": "권장 조정",
         "rec_safe": "현재 운영 규모 유지 · 실제 운영 전 시간대별 수요 추가 확인",
         "rec_caution": "입장 시간 분산 · 대기 동선 확보 · 피크타임 추가 인력 검토",
         "rec_adjust": "수용 인원 확대 · 예약제 또는 회차제 검토 · 운영 동선 재설계",
-
         "target_error": "목표 오차범위",
         "min_sample": "필요 최소 표본",
         "additional": "추가 필요 표본",
         "goal_met": "현재 표본으로 목표 정확도 충족",
         "need_sentence": "오차범위를 ±{error}명 이내로 줄이려면 최소 {n}개의 표본 필요",
-
         "project": "프로젝트",
         "operating_days": "운영 기간",
         "daily_demand": "예상 평균 일 방문 규모",
@@ -503,10 +479,8 @@ TEXT = {
         "status": "운영 상태",
         "precision": "데이터 정확도",
         "target_precision": "목표 정확도",
-
         "core": "창의적인 팝업 기획을 통계적 추정을 통해 실제 실행 가능한 전략으로 연결",
         "core_sub": "Creative Direction × Brand Analytics × Statistical Estimation",
-
         "warning": "통계 해석 시 주의",
         "w1": "본 앱의 데이터는 교육용 가상 데이터",
         "w2": "모표준편차를 알고 있다고 가정",
@@ -514,14 +488,12 @@ TEXT = {
         "w4": "특정 하루의 방문객 예측구간과는 다름",
         "w5": "실제 운영에는 비용, 안전, 시간대별 방문 패턴 등 추가 정보 필요",
         "w6": "모집단이 정규분포를 따르거나 표본이 충분히 큰 상황을 가정",
-
         "collab_values": {
             "limited": "한정 협업 컬렉션",
             "new": "신제품 공개",
             "film": "브랜드 × 영화 협업",
             "season": "시즌 한정 프로젝트",
         },
-
         "character_values": {
             "woody": "우디",
             "buzz": "버즈 라이트이어",
@@ -529,7 +501,6 @@ TEXT = {
             "jessie": "제시",
             "all": "전체 캐릭터",
         },
-
         "product_values": {
             "tee": "티셔츠",
             "hoodie": "후디",
@@ -537,7 +508,6 @@ TEXT = {
             "bag": "가방",
             "acc": "액세서리",
         },
-
         "space_values": {
             "andy": "앤디의 방",
             "space": "우주 테마",
@@ -552,28 +522,20 @@ TEXT = {
         "hero_title": "Pop-up Strategy Simulator",
         "hero_sub": "An educational simulator connecting creative pop-up planning with executable scale through statistical estimation",
         "hero_note": "Fictional collaboration simulator for a school statistics project · Not officially affiliated with Stüssy, Toy Story, Disney/Pixar, or The Hyundai Seoul",
-
         "s1": "Pop-up Planning",
         "s1_copy": "Set the collaboration concept and operating conditions and review the creative brief",
-
         "s2": "Reference Data",
         "s2_copy": "Set fictional sample information from comparable pop-up operations",
-
         "s3": "Statistical Estimation",
         "s3_copy": "Calculate the 95% confidence interval and margin of error assuming population standard deviation is known",
-
         "s4": "Operating Simulation",
         "s4_copy": "Compare how statistical precision changes as sample size changes",
-
         "s5": "Capacity Review",
         "s5_copy": "Compare estimated mean daily visitor demand with planned daily capacity",
-
         "s6": "Required Sample Size",
         "s6_copy": "Choose a target margin of error and calculate the minimum required sample",
-
         "s7": "Strategy Summary",
         "s7_copy": "Combine the creative brief and statistical results into one strategy summary",
-
         "brief": "Creative brief",
         "collab_project": "Collaboration project",
         "popup_name": "Pop-up name",
@@ -588,66 +550,53 @@ TEXT = {
         "capacity": "Daily capacity",
         "budget": "Total budget",
         "concept_line": "Concept line",
-
         "days_unit": "days",
         "staff_unit": "staff",
         "visitors": "visitors",
         "samples": "obs.",
-
         "budget_note": "Planning information only · Not included in statistical calculations",
-
         "virtual_data": "Fictional educational sample data",
         "virtual_desc": "Assumed data from comparable pop-up operations",
-
         "sample_n": "Sample size n",
         "sample_mean": "Sample mean x̄",
         "sample_mean_help": "Average daily visitors from comparable pop-ups",
         "sigma": "Population standard deviation σ",
         "sigma_help": "Variation in daily visitors across comparable pop-ups",
-
         "formula_title": "Formula",
         "sample_mean_card": "Sample mean",
         "moe": "Margin of error",
         "ci": "95% confidence interval",
         "period": "Operating-period reference",
         "period_note": "Simple multiplication of the mean-daily-visitor confidence interval by operating days · Not a prediction interval for a specific day or total attendance",
-
         "ci_chart": "95% Confidence Interval",
         "mean": "Mean",
         "lower": "Lower",
         "upper": "Upper",
-
         "sample_chart": "Sample Size vs Margin of Error",
         "sample_x": "Sample size n",
         "error_y": "Margin of error",
         "sample_desc": "Larger sample → smaller margin of error → more precise estimation",
         "compare": "Sample-size comparison",
         "current_n": "Current n",
-
         "safe": "Capacity Stable",
         "caution": "Capacity Caution",
         "adjust": "Adjustment Needed",
-
         "safe_copy": "Estimated mean visitor demand remains within current capacity",
         "caution_copy": "Part of the estimated mean visitor range exceeds current capacity",
         "adjust_copy": "Estimated mean visitor demand is above current capacity",
-
         "risk": "Main risk",
         "risk_safe": "No major capacity warning",
         "risk_caution": "Possible peak-time congestion",
         "risk_adjust": "Possible persistent capacity shortage",
-
         "recommend": "Recommended adjustment",
         "rec_safe": "Keep current scale · Check time-of-day demand before launch",
         "rec_caution": "Distribute entry times · Secure queue flow · Review peak-time staffing",
         "rec_adjust": "Increase capacity · Review reservation/session entry · Redesign operating flow",
-
         "target_error": "Target margin of error",
         "min_sample": "Minimum sample required",
         "additional": "Additional samples needed",
         "goal_met": "Current sample meets the target precision",
         "need_sentence": "To keep the margin of error within ±{error} visitors, at least {n} observations are required",
-
         "project": "Project",
         "operating_days": "Operating days",
         "daily_demand": "Estimated mean daily visitors",
@@ -655,10 +604,8 @@ TEXT = {
         "status": "Operating status",
         "precision": "Data precision",
         "target_precision": "Target precision",
-
         "core": "Connecting creative pop-up planning with executable strategy through statistical estimation",
         "core_sub": "Creative Direction × Brand Analytics × Statistical Estimation",
-
         "warning": "Statistical interpretation notes",
         "w1": "All app data are fictional and for educational use",
         "w2": "Population standard deviation is assumed to be known",
@@ -666,14 +613,12 @@ TEXT = {
         "w4": "It is not a prediction interval for a specific day",
         "w5": "Real operations also require cost, safety, and time-of-day demand data",
         "w6": "A normal population or sufficiently large sample is assumed",
-
         "collab_values": {
             "limited": "Limited collaboration collection",
             "new": "New product launch",
             "film": "Brand × film collaboration",
             "season": "Seasonal limited project",
         },
-
         "character_values": {
             "woody": "Woody",
             "buzz": "Buzz Lightyear",
@@ -681,7 +626,6 @@ TEXT = {
             "jessie": "Jessie",
             "all": "All characters",
         },
-
         "product_values": {
             "tee": "T-shirts",
             "hoodie": "Hoodies",
@@ -689,7 +633,6 @@ TEXT = {
             "bag": "Bags",
             "acc": "Accessories",
         },
-
         "space_values": {
             "andy": "Andy's room",
             "space": "Space theme",
@@ -740,9 +683,7 @@ def result_card(label, value, detail=""):
     detail_html = ""
 
     if detail:
-        detail_html = (
-            f'<div class="result-note">{safe(detail)}</div>'
-        )
+        detail_html = f'<div class="result-note">{safe(detail)}</div>'
 
     return f"""
     <div class="result-card">
@@ -765,11 +706,7 @@ render_html(
 )
 
 
-section_header(
-    "01",
-    t("s1"),
-    t("s1_copy"),
-)
+section_header("01", t("s1"), t("s1_copy"))
 
 
 planning_left, planning_right = st.columns(
@@ -787,9 +724,7 @@ with planning_left:
     )
 
     if "popup_name" not in st.session_state:
-        st.session_state.popup_name = (
-            "스투시 × 토이 스토리 협업 팝업"
-        )
+        st.session_state.popup_name = "스투시 × 토이 스토리 협업 팝업"
 
     popup_name = st.text_input(
         t("popup_name"),
@@ -915,9 +850,7 @@ with planning_left:
         key="budget",
     )
 
-    st.caption(
-        t("budget_note")
-    )
+    st.caption(t("budget_note"))
 
     if "concept_line" not in st.session_state:
         st.session_state.concept_line = (
@@ -1049,11 +982,7 @@ with planning_right:
     )
 
 
-section_header(
-    "02",
-    t("s2"),
-    t("s2_copy"),
-)
+section_header("02", t("s2"), t("s2_copy"))
 
 
 render_html(
@@ -1061,6 +990,7 @@ render_html(
     <span class="data-chip">
         {safe(t("virtual_data"))}
     </span>
+
     <div style="
         color:#6C6A63;
         font-size:0.78rem;
@@ -1076,7 +1006,6 @@ data_1, data_2, data_3 = st.columns(3)
 
 
 with data_1:
-
     sample_n = st.number_input(
         t("sample_n"),
         min_value=10,
@@ -1088,7 +1017,6 @@ with data_1:
 
 
 with data_2:
-
     sample_mean = st.number_input(
         t("sample_mean"),
         min_value=0.0,
@@ -1102,7 +1030,6 @@ with data_2:
 
 
 with data_3:
-
     sigma = st.number_input(
         t("sigma"),
         min_value=1.0,
@@ -1117,43 +1044,16 @@ with data_3:
 
 Z95 = 1.96
 
+margin_error = Z95 * sigma / math.sqrt(sample_n)
 
-margin_error = (
-    Z95
-    * sigma
-    / math.sqrt(sample_n)
-)
+ci_lower = sample_mean - margin_error
+ci_upper = sample_mean + margin_error
 
-
-ci_lower = (
-    sample_mean
-    - margin_error
-)
+period_lower = ci_lower * operating_days
+period_upper = ci_upper * operating_days
 
 
-ci_upper = (
-    sample_mean
-    + margin_error
-)
-
-
-period_lower = (
-    ci_lower
-    * operating_days
-)
-
-
-period_upper = (
-    ci_upper
-    * operating_days
-)
-
-
-section_header(
-    "03",
-    t("s3"),
-    t("s3_copy"),
-)
+section_header("03", t("s3"), t("s3_copy"))
 
 
 render_html(
@@ -1180,7 +1080,6 @@ r1, r2, r3, r4 = st.columns(
 
 
 with r1:
-
     render_html(
         result_card(
             t("sample_mean_card"),
@@ -1190,7 +1089,6 @@ with r1:
 
 
 with r2:
-
     render_html(
         result_card(
             t("moe"),
@@ -1200,7 +1098,6 @@ with r2:
 
 
 with r3:
-
     render_html(
         result_card(
             t("ci"),
@@ -1211,7 +1108,6 @@ with r3:
 
 
 with r4:
-
     render_html(
         result_card(
             t("period"),
@@ -1223,17 +1119,10 @@ with r4:
 
 fig_ci = go.Figure()
 
-
 fig_ci.add_trace(
     go.Scatter(
-        x=[
-            ci_lower,
-            ci_upper,
-        ],
-        y=[
-            0,
-            0,
-        ],
+        x=[ci_lower, ci_upper],
+        y=[0, 0],
         mode="lines+markers",
         line=dict(
             color="#1E1E1B",
@@ -1247,7 +1136,6 @@ fig_ci.add_trace(
         showlegend=False,
     )
 )
-
 
 fig_ci.add_trace(
     go.Scatter(
@@ -1305,10 +1193,7 @@ fig_ci.update_layout(
     ),
     yaxis=dict(
         visible=False,
-        range=[
-            -0.35,
-            0.45,
-        ],
+        range=[-0.35, 0.45],
     ),
 )
 
@@ -1343,28 +1228,15 @@ with ci_col_3:
     )
 
 
-section_header(
-    "04",
-    t("s4"),
-    t("s4_copy"),
-)
+section_header("04", t("s4"), t("s4_copy"))
 
 
-n_values = np.arange(
-    10,
-    301,
-)
+n_values = np.arange(10, 301)
 
-
-error_values = (
-    Z95
-    * sigma
-    / np.sqrt(n_values)
-)
+error_values = Z95 * sigma / np.sqrt(n_values)
 
 
 fig_error = go.Figure()
-
 
 fig_error.add_trace(
     go.Scatter(
@@ -1430,10 +1302,7 @@ fig_error.update_layout(
         title=t("sample_x"),
         gridcolor="#E4DED2",
         zeroline=False,
-        range=[
-            10,
-            300,
-        ],
+        range=[10, 300],
     ),
     yaxis=dict(
         title=t("error_y"),
@@ -1452,9 +1321,7 @@ st.plotly_chart(
 )
 
 
-st.caption(
-    t("sample_desc")
-)
+st.caption(t("sample_desc"))
 
 
 render_html(
@@ -1470,13 +1337,7 @@ render_html(
 )
 
 
-compare_sizes = [
-    20,
-    50,
-    100,
-    200,
-]
-
+compare_sizes = [20, 50, 100, 200]
 
 compare_cols = st.columns(4)
 
@@ -1486,14 +1347,9 @@ for column, n_compare in zip(
     compare_sizes,
 ):
 
-    compare_error = (
-        Z95
-        * sigma
-        / math.sqrt(n_compare)
-    )
+    compare_error = Z95 * sigma / math.sqrt(n_compare)
 
     with column:
-
         render_html(
             f"""
             <div class="sample-card">
@@ -1510,11 +1366,7 @@ for column, n_compare in zip(
         )
 
 
-section_header(
-    "05",
-    t("s5"),
-    t("s5_copy"),
-)
+section_header("05", t("s5"), t("s5_copy"))
 
 
 if daily_capacity >= ci_upper:
@@ -1525,7 +1377,6 @@ if daily_capacity >= ci_upper:
     risk_text = t("risk_safe")
     recommendation = t("rec_safe")
 
-
 elif daily_capacity >= ci_lower:
 
     status_code = "caution"
@@ -1533,7 +1384,6 @@ elif daily_capacity >= ci_lower:
     status_copy = t("caution_copy")
     risk_text = t("risk_caution")
     recommendation = t("rec_caution")
-
 
 else:
 
@@ -1644,11 +1494,7 @@ with status_right:
     )
 
 
-section_header(
-    "06",
-    t("s6"),
-    t("s6_copy"),
-)
+section_header("06", t("s6"), t("s6_copy"))
 
 
 sample_left, sample_right = st.columns(
@@ -1688,17 +1534,13 @@ additional_needed = max(
 with sample_right:
 
     if additional_needed > 0:
-
         sample_sub = (
             f"{t('additional')} "
             f"{additional_needed} "
             f"{t('samples')}"
         )
-
     else:
-
         sample_sub = t("goal_met")
-
 
     required_sentence = (
         t("need_sentence").format(
@@ -1706,7 +1548,6 @@ with sample_right:
             n=f"{required_n:,}",
         )
     )
-
 
     render_html(
         f"""
@@ -1758,11 +1599,7 @@ render_html(
 )
 
 
-section_header(
-    "07",
-    t("s7"),
-    t("s7_copy"),
-)
+section_header("07", t("s7"), t("s7_copy"))
 
 
 summary_left, summary_right = st.columns(
@@ -1835,17 +1672,13 @@ with summary_left:
 with summary_right:
 
     if additional_needed > 0:
-
         sample_summary = (
             f"{t('additional')} "
             f"{additional_needed} "
             f"{t('samples')}"
         )
-
     else:
-
         sample_summary = t("goal_met")
-
 
     render_html(
         f"""
@@ -1917,7 +1750,6 @@ with summary_right:
 render_html(
     f"""
     <div class="dark-message">
-
         <div class="dark-message-main">
             {safe(t("core"))}
         </div>
@@ -1925,7 +1757,6 @@ render_html(
         <div class="dark-message-sub">
             {safe(t("core_sub"))}
         </div>
-
     </div>
     """
 )
@@ -1937,14 +1768,15 @@ st.write("")
 with st.expander(
     t("warning")
 ):
-
     st.markdown(
-        f"""
-- {t("w1")}
-- {t("w2")}
-- {t("w3")}
-- {t("w4")}
-- {t("w5")}
-- {t("w6")}
-        """
+        "\n".join(
+            [
+                f"- {t('w1')}",
+                f"- {t('w2')}",
+                f"- {t('w3')}",
+                f"- {t('w4')}",
+                f"- {t('w5')}",
+                f"- {t('w6')}",
+            ]
+        )
     )
